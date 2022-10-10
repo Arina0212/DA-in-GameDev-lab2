@@ -45,7 +45,7 @@
 Реализовать совместную работу и передачу данных в связке Python - Google-Sheets – Unity.
 
 Подключила API для работы с Google Sheets:
-![image](https://user-images.githubusercontent.com/114181560/194934901-8fa2c1b0-acff-4bfd-81a5-ff32dad5f887.png)
+![image](https://user-images.githubusercontent.com/114181560/194942230-7b0410b9-8bee-4fe7-890b-e6dcfd3f646f.png)
 
 Python код для записи данных из скрипта в Google Sheets:
 ```py
