@@ -49,16 +49,15 @@
 
 Python код для записи данных из скрипта в Google Sheets:
 ```py
-
 import gspread
 import numpy as np
-gc = gspread.service_account(filename='unitydatascience-365116-136af73acabe.json')
-sh = gc.open("UnitySheets")
+gc = gspread.service_account(filename='unitydatascience-365116-9559eb72b7bd.json')
+sh = gc.open("unitySheets")
 price = np.random.randint(2000, 10000, 11)
 mon = list(range(1,11))
 i = 0
 while i <= len(mon):
-    i += 1
+    i +=1
     if i== 0:
         continue
     else:
@@ -71,7 +70,7 @@ while i <= len(mon):
         print(tempInf)
 
 ```
-Создала Unity проект и написал скрипт для получения данных из Google Sheets:
+Создала Unity проект и написала скрипт для получения данных из Google Sheets:
 ```py
 
 using System.Collections;
@@ -99,19 +98,19 @@ public class NewBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (dataSet["Mon_" + i.ToString()] <= 10 & statusStart == false & i != dataSet.Count)
+        if (dataSet["Mon_" + i.ToString()] <= 10 & statusStart==false & i != dataSet.Count)
         {
             StartCoroutine(PlaySelectAudioGood());
             Debug.Log(dataSet["Mon_" + i.ToString()]);
         }
 
-        if (dataSet["Mon_" + i.ToString()] > 10 & dataSet["Mon_" + i.ToString()] < 100 & statusStart == false & i != dataSet.Count)
+        if (dataSet["Mon_" + i.ToString()] > 10 & dataSet["Mon_" + i.ToString()] < 100 & statusStart==false & i != dataSet.Count)
         {
             StartCoroutine(PlaySelectAudioNormal());
             Debug.Log(dataSet["Mon_" + i.ToString()]);
         }
 
-        if (dataSet["Mon_" + i.ToString()] >= 100 & statusStart == false & i != dataSet.Count)
+        if (dataSet["Mon_" + i.ToString()] >= 100 & statusStart==false & i != dataSet.Count)
         {
             StartCoroutine(PlaySelectAudioBad());
             Debug.Log(dataSet["Mon_" + i.ToString()]);
@@ -131,13 +130,46 @@ public class NewBehaviourScript : MonoBehaviour
             dataSet.Add(("Mon_" + selectRow[0]), float.Parse(selectRow[2]));
         }
     }
+    IEnumerator PlaySelectAudioGood()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = goodSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart=false;
+        i++;
+    }
+
+    IEnumerator PlaySelectAudioNormal()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = normalSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart=false;
+        i++;
+    }
+
+    IEnumerator PlaySelectAudioBad()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = badSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(4);
+        statusStart=false;
+        i++;
+    }
+}
     
 ```
 Создала проект в Unity, где будут воспроизводится аудио в зависимости от полученных результатов из таблицы
 ![image](https://user-images.githubusercontent.com/114181560/194936954-08783e6a-1409-4647-ae0f-91f8043f4a78.png)
 ![image](https://user-images.githubusercontent.com/114181560/194937331-c9bb08d4-d1f6-4456-8243-f392bac08c26.png)
 
-- Определите связанные функции. Функция модели: определяет модель линейной регрессии wx+b. Функция потерь: функция потерь среднеквадратичной ошибки. Функция оптимизации: метод градиентного спуска для нахождения частных производных w и b.
+
 
 
 ## Задание 2
@@ -255,7 +287,9 @@ for i in range(2, 9):
 
 ## Выводы
 
-Абзац умных слов о том, что было сделано и что было узнано.
+Научились связывать Google Таблицы с Python и Unity. 
+Генерировать данные в Python и записывать их в  Google Таблицу.
+И реализовали воспроизведение аудио в Unity.
 
 
 ## Powered by
