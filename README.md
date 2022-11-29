@@ -206,23 +206,17 @@ def iterate(a, b, x, y, times):
     return a, b
 
 
-gc = gspread.service_account(filename='unitydatascience-365116-136af73acabe.json')
-sh = gc.open("UnitySheets")
+gc = gspread.service_account(filename='unitydatascience-365116-9559eb72b7bd.json')
+sh = gc.open("unitySheets")
 x = [3, 21, 22, 34, 54, 34, 55, 67, 89, 99]
 y = [2, 22, 24, 65, 79, 82, 55, 130, 150, 199]
 x, y = np.array(x), np.array(y)
 n_iterations = 1
-initialized = False
-worksheet = sh.get_worksheet(1)
+
+worksheet = sh.get_worksheet(0)
 
 
-for i in range(2, 9):
-    if not initialized:
-        worksheet.update('A1', "Значение a")
-        worksheet.update('B1', "Значение b")
-        worksheet.update('C1', "Количество итераций")
-        worksheet.update('D1', "Потеря (loss)")
-        initialized = True
+for i in range(1, 8):
 
     a, b = np.random.rand(1), np.random.rand(1)
     Lr = 0.000_000_01
@@ -233,10 +227,13 @@ for i in range(2, 9):
 
     a_value = a[0]
     b_value = b[0]
-    worksheet.update(f'A{i}', a_value)
-    worksheet.update(f'B{i}', b_value)
-    worksheet.update(f'C{i}', n_iterations)
-    worksheet.update(f'D{i}', loss)
+    loss = str(loss)
+    loss = loss.replace('.', ',')
+    worksheet.update(('A' + str(i)), str(i))
+    worksheet.update(('B' + str(i)), str(a_value))
+    worksheet.update(('C' + str(i)), str(b_value))
+    worksheet.update(('D' + str(i)), str(n_iterations))
+    worksheet.update(('E' + str(i)), str(loss))
     print(f"a: {a_value}, b: {b_value}, iterations: {n_iterations}, loss: {loss}")
     n_iterations *= 10
 
@@ -247,31 +244,55 @@ for i in range(2, 9):
 ### Самостоятельно разработать сценарий воспроизведения звукового сопровождения в Unity в зависимости от изменения считанных данных в задании 2.
 
 ```py
+    using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using SimpleJSON;
+
+public class NewBehaviourScript : MonoBehaviour
+{
+    public AudioClip goodSpeak;
+    public AudioClip normalSpeak;
+    public AudioClip badSpeak;
+    private AudioSource selectAudio;
+    private Dictionary<string,float> dataSet = new Dictionary<string, float>();
+    private bool statusStart = false;
+    private int i = 1;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartCoroutine(GoogleSheets());
+    }
+
+    // Update is called once per frame
     void Update()
     {
-        if (dataSet["Mon_" + i] <= 600 & statusStart == false & i != dataSet.Count)
+        if (dataSet["Mon_" + i.ToString()] <= 1000 & statusStart==false & i != dataSet.Count)
         {
-            StartCoroutine(PlaySelectAudioBad());
-            Debug.Log(dataSet["Mon_" + i]);
-        }
-        if (dataSet["Mon_" + i.ToString()] > 400 & dataSet["Mon_" + i.ToString()] < 600 & statusStart == false & i != dataSet.Count)
-        {
-            StartCoroutine(PlaySelectAudioNormal());
-            Debug.Log(dataSet["Mon_" + i]);
+            StartCoroutine(PlaySelectAudioGood());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
         }
 
-         if (dataSet["Mon_" + i.ToString()] >= 400 & statusStart == false & i != dataSet.Count)
-         {
-        
-              StartCoroutine(PlaySelectAudioGood());
-              Debug.Log(dataSet["Mon_" + i]);
-         }
-    
+        if (dataSet["Mon_" + i.ToString()] > 1000 & dataSet["Mon_" + i.ToString()] < 2000 & statusStart==false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioNormal());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+        if (dataSet["Mon_" + i.ToString()] >= 2000 & statusStart==false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioBad());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+    }
+
     IEnumerator GoogleSheets()
     {
-        var currentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/1tJI8GWYXUV2vFOgFWKrUEWLiv6cqMJVfBL5HTUi5dQY/values/Лист1?key=AIzaSyDlMi_9ukGm7qB5nvoodlSeTYTbkagnQfw");
-        yield return currentResp.SendWebRequest();
-        var rawResp = currentResp.downloadHandler.text;
+        UnityWebRequest curentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/1tJI8GWYXUV2vFOgFWKrUEWLiv6cqMJVfBL5HTUi5dQY/values/Лист1?key=AIzaSyDlMi_9ukGm7qB5nvoodlSeTYTbkagnQfw");
+        yield return curentResp.SendWebRequest();
+        string rawResp = curentResp.downloadHandler.text;
         var rawJson = JSON.Parse(rawResp);
         foreach (var itemRawJson in rawJson["values"])
         {
@@ -280,6 +301,39 @@ for i in range(2, 9):
             dataSet.Add(("Mon_" + selectRow[0]), float.Parse(selectRow[4]));
         }
     }
+    IEnumerator PlaySelectAudioGood()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = goodSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart=false;
+        i++;
+    }
+
+    IEnumerator PlaySelectAudioNormal()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = normalSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart=false;
+        i++;
+    }
+
+    IEnumerator PlaySelectAudioBad()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = badSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(4);
+        statusStart=false;
+        i++;
+    }
+}
 
 ```
 ![image](https://user-images.githubusercontent.com/114181560/194939736-737e5958-dd2a-4937-8c30-27f591130f5e.png)
