@@ -336,7 +336,7 @@ public class NewBehaviourScript : MonoBehaviour
 }
 
 ```
-![image](https://user-images.githubusercontent.com/114181560/194939736-737e5958-dd2a-4937-8c30-27f591130f5e.png)
+![2022-11-29 (4)](https://user-images.githubusercontent.com/114181560/204479552-ea091dac-1047-4cb6-b678-75fa573aed82.png)
 
 
 ## Выводы
